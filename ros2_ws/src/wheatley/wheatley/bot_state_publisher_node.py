@@ -1,82 +1,45 @@
-from math import sin, cos, pi
+import math
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Quaternion
 from sensor_msgs.msg import JointState
-from tf2_ros import TransformBroadcaster, TransformStamped
 
 
 class StatePublisher(Node):
     def __init__(self):
         super().__init__("state_publisher")
 
+        # Create publisher
         self.joint_pub = self.create_publisher(JointState, "joint_states", 10)
-        self.broadcaster = TransformBroadcaster(self)
 
-        # robot state
-        self.degree = pi / 180.0
-        self.tilt = 0.0
-        self.tinc = self.degree
-        self.swivel = 0.0
-        self.angle = 0.0
-        self.height = 0.0
-        self.hinc = 0.005
+        # Joint names
+        self.joint_names = ["arm_joint", "spinner_joint"]
 
-        # message declarations
-        self.odom_trans = TransformStamped()
-        self.odom_trans.header.frame_id = "odom"
-        self.odom_trans.child_frame_id = "axis"
+        # Timer: update at 50 Hz
+        self.timer = self.create_timer(0.02, self.timer_callback)
 
-        # Run at 30 Hz
-        self.timer = self.create_timer(1.0 / 30.0, self.timer_callback)
+        # Phase for sine wave
+        self.start_time = self.get_clock().now().nanoseconds / 1e9  # seconds
 
     def timer_callback(self):
-        now = self.get_clock().now().to_msg()
+        now = self.get_clock().now().nanoseconds / 1e9
+        t = now - self.start_time
 
-        # update joint_state
-        joint_state = JointState()
-        joint_state.header.stamp = now
-        joint_state.name = ["swivel", "tilt", "periscope"]
-        joint_state.position = [self.swivel, self.tilt, self.height]
+        # Oscillate between -180 and 180 degrees
+        angle_rad = math.radians(180)  # amplitude
+        freq_arm = 0.1  # Hz (slow)
+        freq_spinner = 0.05  # Hz (even slower)
 
-        # update transform
-        self.odom_trans.header.stamp = now
-        self.odom_trans.transform.translation.x = cos(self.angle) * 2
-        self.odom_trans.transform.translation.y = sin(self.angle) * 2
-        self.odom_trans.transform.translation.z = 0.7
-        self.odom_trans.transform.rotation = euler_to_quaternion(
-            0, 0, self.angle + pi / 2
-        )
+        arm_angle = angle_rad * math.sin(2 * math.pi * freq_arm * t)
+        spinner_angle = angle_rad * math.sin(2 * math.pi * freq_spinner * t)
 
-        # publish
-        self.joint_pub.publish(joint_state)
-        self.broadcaster.sendTransform(self.odom_trans)
+        # Publish joint state
+        msg = JointState()
+        msg.header.stamp = self.get_clock().now().to_msg()
+        msg.name = self.joint_names
+        msg.position = [arm_angle, spinner_angle]
 
-        # update state
-        self.tilt += self.tinc
-        if self.tilt < -0.5 or self.tilt > 0.0:
-            self.tinc *= -1
-        self.height += self.hinc
-        if self.height > 0.2 or self.height < 0.0:
-            self.hinc *= -1
-        self.swivel += self.degree
-        self.angle += self.degree / 4
-
-
-def euler_to_quaternion(roll, pitch, yaw):
-    qx = sin(roll / 2) * cos(pitch / 2) * cos(yaw / 2) - cos(roll / 2) * sin(
-        pitch / 2
-    ) * sin(yaw / 2)
-    qy = cos(roll / 2) * sin(pitch / 2) * cos(yaw / 2) + sin(roll / 2) * cos(
-        pitch / 2
-    ) * sin(yaw / 2)
-    qz = cos(roll / 2) * cos(pitch / 2) * sin(yaw / 2) - sin(roll / 2) * sin(
-        pitch / 2
-    ) * cos(yaw / 2)
-    qw = cos(roll / 2) * cos(pitch / 2) * cos(yaw / 2) + sin(roll / 2) * sin(
-        pitch / 2
-    ) * sin(yaw / 2)
-    return Quaternion(x=qx, y=qy, z=qz, w=qw)
+        self.joint_pub.publish(msg)
 
 
 def main(args=None):

@@ -1,27 +1,19 @@
 from pathlib import Path
 from launch import LaunchDescription
+from launch.substitutions import Command
 
 # from launch.actions import DeclareLaunchArgument
 # from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 
+PACKAGE_NAME = "wheatley"
+PACKAGE_SHARE_DIR = Path(get_package_share_directory(PACKAGE_NAME))
+
 
 def generate_launch_description():
-    # use_sim_time = LaunchConfiguration("use_sim_time", default="false")
-    # Read URDF content
-    with open(
-        Path(get_package_share_directory("wheatley")) / "urdf" / "bot.urdf.xml", "r"
-    ) as f:
-        robot_desc = f.read()
-
     return LaunchDescription(
         [
-            # DeclareLaunchArgument(
-            #     "use_sim_time",
-            #     default_value="false",
-            #     description="Use simulation (Gazebo) clock if true",
-            # ),
             # Robot State Publisher
             Node(
                 package="robot_state_publisher",
@@ -30,8 +22,12 @@ def generate_launch_description():
                 output="screen",
                 parameters=[
                     {
-                        # "use_sim_time": use_sim_time,
-                        "robot_description": robot_desc,
+                        "robot_description": Command(
+                            [
+                                "xacro ",
+                                str(PACKAGE_SHARE_DIR / "urdf" / "bot.xacro"),
+                            ]
+                        )
                     }
                 ],
             ),
@@ -65,7 +61,7 @@ def generate_launch_description():
             #     output="screen",
             # ),
             Node(
-                package="wheatley",
+                package=PACKAGE_NAME,
                 executable="bot_state_publisher_node",
                 name="bot_state_publisher_node",
                 output="screen",

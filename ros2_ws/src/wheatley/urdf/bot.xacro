@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="bot">
+  <xacro:property name="package_name" value="wheatley" />
+  <xacro:include filename="$(find ${package_name})/urdf/materials.xacro" />
+  <xacro:include filename="$(find ${package_name})/urdf/gazebo.xacro" />
+  <link name="base_link">
+    <inertial>
+      <origin xyz="1.7370069300e-17 5.7900231001e-18 2.5000000000e-02" rpy="0.0 0.0 0.0" />
+      <mass value="3.0826877913e+00" />
+      <inertia ixx="2.5689064928e-03" iyy="2.5689064928e-03" izz="3.8533597392e-03"
+        ixy="2.8558133636e-18" iyz="4.4622083806e-19" ixz="6.2470917328e-19" />
+    </inertial>
+    <visual>
+      <origin xyz="0.0000000000e+00 0.0000000000e+00 0.0000000000e+00" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="file://$(find ${package_name})/meshes/base.stl"
+          scale="0.001 0.001 0.001" />
+      </geometry>
+      <material name="default_material" />
+    </visual>
+    <collision>
+      <origin xyz="0.0000000000e+00 0.0000000000e+00 0.0000000000e+00" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="file://$(find ${package_name})/meshes/base_collision.stl"
+          scale="0.001 0.001 0.001" />
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="arm_link">
+    <inertial>
+      <origin xyz="1.7001195431e-18 -1.7541522519e-02 1.4540158770e-01" rpy="0.0 0.0 0.0" />
+      <mass value="1.3123219478e+00" />
+      <inertia ixx="7.6374268774e-03" iyy="6.5065599184e-03" izz="1.2723232048e-03"
+        ixy="-3.9136964396e-20" iyz="1.4870635260e-03" ixz="7.8984630651e-20" />
+    </inertial>
+    <visual>
+      <origin xyz="0.0000000000e+00 0.0000000000e+00 -5.0000000000e-02" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="file://$(find ${package_name})/meshes/arm.stl" scale="0.001 0.001 0.001" />
+      </geometry>
+      <material name="default_material" />
+    </visual>
+    <collision>
+      <origin xyz="0.0000000000e+00 0.0000000000e+00 -5.0000000000e-02" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="file://$(find ${package_name})/meshes/arm_collision.stl"
+          scale="0.001 0.001 0.001" />
+      </geometry>
+      <xacro:if value="${'default_material' in existing_contact_coefficients}">
+        <xacro:insert_block name="default_material_contact_coefficients" />
+      </xacro:if>
+
+    </collision>
+  </link>
+
+  <joint name="arm_joint" type="continuous">
+    <origin xyz="0.0000000000e+00 0.0000000000e+00 5.0000000000e-02" rpy="0.0 0.0 0.0" />
+    <parent link="base_link" />
+    <child link="arm_link" />
+    <axis xyz="0.0 0.0 1.0" />
+  </joint>
+
+  <link name="spinner_link">
+    <inertial>
+      <origin xyz="0.0000000000e+00 -7.0260347622e-03 -2.9419222885e-02" rpy="0.0 0.0 0.0" />
+      <mass value="3.2520188669e-02" />
+      <inertia ixx="1.6903041667e-05" iyy="1.7030108827e-05" izz="4.0209146690e-07"
+        ixy="-2.7017277304e-21" iyz="-4.5345139610e-07" ixz="2.7888802379e-21" />
+    </inertial>
+    <visual>
+      <origin xyz="0.0000000000e+00 1.0000000000e-01 -2.6000000000e-01" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="file://$(find ${package_name})/meshes/spinner.stl"
+          scale="0.001 0.001 0.001" />
+      </geometry>
+      <material name="default_material" />
+    </visual>
+    <collision>
+      <origin xyz="0.0000000000e+00 1.0000000000e-01 -2.6000000000e-01" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="file://$(find ${package_name})/meshes/spinner_collision.stl"
+          scale="0.001 0.001 0.001" />
+      </geometry>
+      <xacro:if value="${'default_material' in existing_contact_coefficients}">
+        <xacro:insert_block name="default_material_contact_coefficients" />
+      </xacro:if>
+
+    </collision>
+  </link>
+
+  <joint name="spinner_joint" type="continuous">
+    <origin xyz="0.0000000000e+00 -1.0000000000e-01 2.1000000000e-01" rpy="0.0 0.0 0.0" />
+    <parent link="arm_link" />
+    <child link="spinner_link" />
+    <axis xyz="0.0 -1.0 0.0" />
+  </joint>
+
+</robot>

@@ -9,6 +9,7 @@ Ros2 testing...
 conda create -n ros_env -c conda-forge -c robostack-jazzy ros-jazzy-desktop
 conda activate ros_env
 conda install -c conda-forge compilers cmake pkg-config make ninja colcon-common-extensions catkin_tools rosdep
+conda install robostack-jazzy::ros-jazzy-xacro
 ```
 
 ```bash
