@@ -1,0 +1,6 @@
+source;share/wheatley/hook/pythonpath.ps1
+source;share/wheatley/hook/pythonpath.dsv
+source;share/wheatley/hook/pythonpath.sh
+source;share/wheatley/hook/ament_prefix_path.ps1
+source;share/wheatley/hook/ament_prefix_path.dsv
+source;share/wheatley/hook/ament_prefix_path.sh

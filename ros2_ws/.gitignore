@@ -1,6 +1,4 @@
-.vscode/
 scratch.sh
-with_docker/
 devel/
 logs/
 build/

@@ -1,0 +1,30 @@
+running egg_info
+writing ../../build/wheatley/wheatley.egg-info/PKG-INFO
+writing dependency_links to ../../build/wheatley/wheatley.egg-info/dependency_links.txt
+writing entry points to ../../build/wheatley/wheatley.egg-info/entry_points.txt
+writing requirements to ../../build/wheatley/wheatley.egg-info/requires.txt
+writing top-level names to ../../build/wheatley/wheatley.egg-info/top_level.txt
+reading manifest file '../../build/wheatley/wheatley.egg-info/SOURCES.txt'
+writing manifest file '../../build/wheatley/wheatley.egg-info/SOURCES.txt'
+running build
+running build_py
+copying wheatley/__init__.py -> /Users/dcyoung/github/animatronics/ros2_ws/build/wheatley/build/lib/wheatley
+copying wheatley/bot_state_publisher_node.py -> /Users/dcyoung/github/animatronics/ros2_ws/build/wheatley/build/lib/wheatley
+copying wheatley/hello_world_node.py -> /Users/dcyoung/github/animatronics/ros2_ws/build/wheatley/build/lib/wheatley
+running install
+running install_lib
+running install_data
+copying resource/wheatley -> /Users/dcyoung/github/animatronics/ros2_ws/install/wheatley/share/ament_index/resource_index/packages
+copying package.xml -> /Users/dcyoung/github/animatronics/ros2_ws/install/wheatley/share/wheatley
+copying package.xml -> /Users/dcyoung/github/animatronics/ros2_ws/install/wheatley/share/wheatley
+copying launch/start_all.launch.py -> /Users/dcyoung/github/animatronics/ros2_ws/install/wheatley/share/wheatley/launch
+copying launch/hello.launch.py -> /Users/dcyoung/github/animatronics/ros2_ws/install/wheatley/share/wheatley/launch
+copying urdf/bk_bot.urdf.xml -> /Users/dcyoung/github/animatronics/ros2_ws/install/wheatley/share/wheatley/urdf
+copying urdf/bot.urdf.xml -> /Users/dcyoung/github/animatronics/ros2_ws/install/wheatley/share/wheatley/urdf
+running install_egg_info
+removing '/Users/dcyoung/github/animatronics/ros2_ws/install/wheatley/lib/python3.12/site-packages/wheatley-0.0.0-py3.12.egg-info' (and everything under it)
+Copying ../../build/wheatley/wheatley.egg-info to /Users/dcyoung/github/animatronics/ros2_ws/install/wheatley/lib/python3.12/site-packages/wheatley-0.0.0-py3.12.egg-info
+running install_scripts
+Installing bot_state_publisher_node script to /Users/dcyoung/github/animatronics/ros2_ws/install/wheatley/lib/wheatley
+Installing hello_world_node script to /Users/dcyoung/github/animatronics/ros2_ws/install/wheatley/lib/wheatley
+writing list of installed files to '/Users/dcyoung/github/animatronics/ros2_ws/build/wheatley/install.log'
