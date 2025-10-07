@@ -16,6 +16,8 @@ setup(
         (f"share/{PACKAGE_NAME}/urdf", glob("urdf/*")),
         # Install all mesh files
         (f"share/{PACKAGE_NAME}/meshes", glob("meshes/*")),
+        # Install all config files
+        (f"share/{PACKAGE_NAME}/config", glob("config/*")),
     ],
     install_requires=["setuptools"],
     zip_safe=True,

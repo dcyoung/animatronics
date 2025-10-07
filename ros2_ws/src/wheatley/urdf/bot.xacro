@@ -13,7 +13,7 @@
     <visual>
       <origin xyz="0.0000000000e+00 0.0000000000e+00 0.0000000000e+00" rpy="0.0 0.0 0.0" />
       <geometry>
-        <mesh filename="file://$(find ${package_name})/meshes/base.stl"
+        <mesh filename="package://${package_name}/meshes/base.stl"
           scale="0.001 0.001 0.001" />
       </geometry>
       <material name="default_material" />
@@ -21,7 +21,7 @@
     <collision>
       <origin xyz="0.0000000000e+00 0.0000000000e+00 0.0000000000e+00" rpy="0.0 0.0 0.0" />
       <geometry>
-        <mesh filename="file://$(find ${package_name})/meshes/base_collision.stl"
+        <mesh filename="package://${package_name}/meshes/base_collision.stl"
           scale="0.001 0.001 0.001" />
       </geometry>
     </collision>
@@ -37,14 +37,14 @@
     <visual>
       <origin xyz="0.0000000000e+00 0.0000000000e+00 -5.0000000000e-02" rpy="0.0 0.0 0.0" />
       <geometry>
-        <mesh filename="file://$(find ${package_name})/meshes/arm.stl" scale="0.001 0.001 0.001" />
+        <mesh filename="package://${package_name}/meshes/arm.stl" scale="0.001 0.001 0.001" />
       </geometry>
       <material name="default_material" />
     </visual>
     <collision>
       <origin xyz="0.0000000000e+00 0.0000000000e+00 -5.0000000000e-02" rpy="0.0 0.0 0.0" />
       <geometry>
-        <mesh filename="file://$(find ${package_name})/meshes/arm_collision.stl"
+        <mesh filename="package://${package_name}/meshes/arm_collision.stl"
           scale="0.001 0.001 0.001" />
       </geometry>
       <xacro:if value="${'default_material' in existing_contact_coefficients}">
@@ -71,7 +71,7 @@
     <visual>
       <origin xyz="0.0000000000e+00 1.0000000000e-01 -2.6000000000e-01" rpy="0.0 0.0 0.0" />
       <geometry>
-        <mesh filename="file://$(find ${package_name})/meshes/spinner.stl"
+        <mesh filename="package://${package_name}/meshes/spinner.stl"
           scale="0.001 0.001 0.001" />
       </geometry>
       <material name="default_material" />
@@ -79,7 +79,7 @@
     <collision>
       <origin xyz="0.0000000000e+00 1.0000000000e-01 -2.6000000000e-01" rpy="0.0 0.0 0.0" />
       <geometry>
-        <mesh filename="file://$(find ${package_name})/meshes/spinner_collision.stl"
+        <mesh filename="package://${package_name}/meshes/spinner_collision.stl"
           scale="0.001 0.001 0.001" />
       </geometry>
       <xacro:if value="${'default_material' in existing_contact_coefficients}">

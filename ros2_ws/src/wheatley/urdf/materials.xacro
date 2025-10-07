@@ -3,5 +3,11 @@
   <material name="default_material">
     <color rgba="0.5 0.5 0.5 1.0" />
   </material>
+  <material name="arm_material">
+    <color rgba="0.8 0.2 0.2 1.0" />
+  </material>
+  <material name="spinner_material">
+    <color rgba="0.2 0.8 0.2 1.0" />
+  </material>
   <xacro:property name="existing_contact_coefficients" value="[]" />
 </robot>
