@@ -5,11 +5,20 @@ Ros2 testing...
 ## Local
 
 ```bash
-# Create ros env
-conda create -n ros_env -c conda-forge -c robostack-jazzy ros-jazzy-desktop
-conda activate ros_env
-conda install -c conda-forge compilers cmake pkg-config make ninja colcon-common-extensions catkin_tools rosdep
-conda install robostack-jazzy::ros-jazzy-xacro robostack-jazzy::ros-jazzy-joint-state-publisher robostack-jazzy::ros-jazzy-joint-state-publisher-gui
+conda create -n ros_humble -c conda-forge -c robostack-humble \
+    ros-humble-desktop \
+    ros-humble-xacro \
+    ros-humble-joint-state-publisher \
+    ros-humble-joint-state-publisher-gui \
+    ros-humble-ros-gz \
+    ros-humble-ros-gz-bridge \
+    ros-humble-ros-gz-sim \
+    libignition-gazebo6
+# Gazebo Classic
+    # ros-humble-gazebo-ros \
+    # ros-humble-gazebo-ros-pkgs \
+conda activate ros_humble
+conda install compilers cmake pkg-config make ninja colcon-common-extensions catkin_tools rosdep
 ```
 
 ```bash

@@ -1,7 +1,52 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="bot">
-  <gazebo>
-    <plugin filename="ignition-gazebo-joint-state-publisher-system"
-      name="ignition::gazebo::systems::JointStatePublisher" />
+
+  <!-- Modern Gazebo (gz) plugins and properties -->
+
+  <!-- Base link gazebo properties -->
+  <gazebo reference="base_link">
+    <material>
+      <ambient>0.5 0.5 0.5 1</ambient>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.0 0.0 0.0 1</specular>
+    </material>
   </gazebo>
+
+  <!-- Arm link gazebo properties -->
+  <gazebo reference="arm_link">
+    <material>
+      <ambient>0.8 0.2 0.2 1</ambient>
+      <diffuse>0.8 0.2 0.2 1</diffuse>
+      <specular>0.0 0.0 0.0 1</specular>
+    </material>
+  </gazebo>
+
+  <!-- Spinner link gazebo properties -->
+  <gazebo reference="spinner_link">
+    <material>
+      <ambient>0.2 0.8 0.2 1</ambient>
+      <diffuse>0.2 0.8 0.2 1</diffuse>
+      <specular>0.0 0.0 0.0 1</specular>
+    </material>
+  </gazebo>
+
+  <!-- Gazebo plugins -->
+  <gazebo>
+    <!-- Joint State Publisher -->
+    <plugin filename="gz-sim-joint-state-publisher-system"
+      name="gz::sim::systems::JointStatePublisher">
+    </plugin>
+
+    <!-- Joint Position Controller -->
+    <plugin filename="gz-sim-joint-position-controller-system"
+      name="gz::sim::systems::JointPositionController">
+      <joint_name>arm_joint</joint_name>
+    </plugin>
+
+    <plugin filename="gz-sim-joint-position-controller-system"
+      name="gz::sim::systems::JointPositionController">
+      <joint_name>spinner_joint</joint_name>
+    </plugin>
+  </gazebo>
+
 </robot>

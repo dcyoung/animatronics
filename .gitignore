@@ -1,4 +1,5 @@
 .vscode/
+.DS_Store
 scratch.sh
 with_docker/
 devel/
