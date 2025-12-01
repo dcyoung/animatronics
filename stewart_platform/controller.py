@@ -1,3 +1,5 @@
+import math
+from typing import Optional, Tuple
 import numpy as np
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import matplotlib.pyplot as plt
@@ -25,6 +27,35 @@ class Servo_Configuration(object):
         beta : float
             Servo arm orientation angle (radians) - angle between the plane in which
             the servo arm moves and the xz-plane of the base CS
+        """
+        self.B = B
+        self.P = P
+        self.lhl = lhl
+        self.ldl = ldl
+        self.beta = beta
+
+
+class RotationServo_Configuration(object):
+    """Configuration for a single yaw servo in the Stewart Platform"""
+
+    def __init__(
+        self, B: np.ndarray, P: np.ndarray, lhl: float, ldl: float, beta: float
+    ):
+        """
+        Initialize a servo configuration.
+
+        Parameters:
+        -----------
+        B : np.ndarray (3,)
+            Base anchor position in local frame (where servo arm connects to base)
+        P : np.ndarray (3,)
+            Base anchor position in locale frame (where connecting rod connects to rotatable part of base)
+        lhl : float
+            Length of servo horn
+        ldl : float
+            Length of connecting rod
+        beta : float
+            Servo arm orientation angle (radians) - starting angle of the servo horn in the xy-plane
         """
         self.B = B
         self.P = P
@@ -421,3 +452,65 @@ class Stewart_Platform(object):
     #         [-np.sin(psi), np.cos(psi), 0 ],
     #         [   0        ,     0      , 1 ] ])
     #     return rotz
+
+
+def solve_joint_point_np(Q, P, H, L):
+    """
+    NumPy version.
+
+    Q : array-like of shape (3,)   (servo base point, ie: center of servo horn rotation)
+    P : array-like of shape (3,)   (target base anchor)
+    H : float                      (servo horn length)
+    L : float                      (rod length)
+
+    Returns:
+        (J1, J2) where each is a (3,) NumPy array
+        or None if no valid solutions exist.
+    """
+
+    Q = np.asarray(Q, dtype=float)
+    P = np.asarray(P, dtype=float)
+
+    # vertical separation
+    dz = P[2] - Q[2]
+
+    # Check if the rod can reach vertically
+    if abs(dz) > L:
+        return None
+
+    # Effective rod length in XY
+    Lxy = np.sqrt(L**2 - dz**2)
+
+    # XY vectors
+    Qxy = Q[:2]
+    Pxy = P[:2]
+    d_vec = Pxy - Qxy
+    d = np.linalg.norm(d_vec)
+
+    # Check XY circle reach
+    if d > H + Lxy or d < abs(H - Lxy):
+        return None
+
+    # Distance along the line between Q and P to chord midpoint
+    a = (H**2 - Lxy**2 + d**2) / (2 * d)
+
+    # XY midpoint between the two possible joint points
+    midpoint = Qxy + (a / d) * d_vec
+
+    # Distance from midpoint to intersection
+    h_sq = H**2 - a**2
+    h_sq = max(h_sq, 0.0)  # guard against tiny negatives
+    h = np.sqrt(h_sq)
+
+    # Perpendicular direction
+    perp = np.array([-d_vec[1], d_vec[0]]) / d  # rotate 90°
+
+    # Two solutions
+    J1_xy = midpoint + h * perp
+    J2_xy = midpoint - h * perp
+
+    # Full 3D points (z stays at Qz)
+    J1 = np.array([J1_xy[0], J1_xy[1], Q[2]])
+    J2 = np.array([J2_xy[0], J2_xy[1], Q[2]])
+
+    return J1, J2
