@@ -1,0 +1,90 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "personality_core"
+version = "0.0.1"
+authors = [{ name = "David Young", email = "david@questionablyartificial.com" }]
+description = ""
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "reachy-mini[mujoco]>=1.3.0",
+    "numpy>=2.2.5",
+    "scipy>=1.15.3, <2.0.0",
+    "opencv-python<=5.0",
+    "psutil",
+    "uvicorn[standard]",
+    "fastapi",
+    "pyserial",
+    "asgiref",
+    "aiohttp",
+    "pyusb>=1.2.1",
+    "libusb_package>=1.0.26.3",
+    "pip>=25",
+    "toml",
+    "rustypot>=1.4.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "matplotlib",
+    "pytest",
+    "pytest-asyncio",
+    "ruff==0.12.0",
+    "onshape-to-robot==1.7.6",
+    "mypy==1.18.2",
+    "types-requests",
+    "types-toml",
+]
+examples = ["pynput"]
+mujoco = ["mujoco==3.3.0"]
+placo_kinematics = ["placo==0.9.14; sys_platform != 'win32'"]
+# gstreamer = ["PyGObject>=3.42.2,<=3.46.0", "gst-signalling>=1.1.2"]
+rerun = ["rerun-sdk>=0.27.2", "urdf-parser-py==0.0.4"]
+all = [
+    "personality_core[dev]",
+    "personality_core[mujoco]",
+    "personality_core[placo_kinematics]",
+    # "personality_core[gstreamer]",
+    "personality_core[rerun]",
+]
+
+[project.scripts]
+personality-core-daemon = "personality_core.daemon.app.main:main"
+personality-core-visualize-look-at = "personality_core.kinematics.stewart_platform_3dof.examples.visualize_look_at:cli"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+include-package-data = true
+
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+
+[tool.setuptools.package-data]
+personality_core = ["**/*"]
+
+[tool.ruff]
+exclude = [
+    "src/personality_core/__init__.py",
+    "build/*",
+    "conftest.py",
+    "src/personality_core_dashboard/*",
+    "tests/*",
+    "misc/*",
+    "BK_src/*",
+]
+lint.extend-select = ["I", "D"]
+lint.ignore = [
+    "D203", # Incompatible with D211
+    "D213", # Incompatible with D212
+]
+
+[tool.mypy]
+python_version = "3.10"
+files = ["src/"]
+ignore_missing_imports = true
+strict = true
