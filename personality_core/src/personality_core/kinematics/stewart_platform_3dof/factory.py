@@ -1,15 +1,13 @@
 """Build visualization-ready Head objects from a HeadConfig.
 
-This module is the bridge between the IK solver (``ik_solver.py``) and the
-3-D visualization layer (``head.py``, ``render.py``).  Config and IK logic
-live in :mod:`personality_core.kinematics.stewart_platform_3dof.ik_solver` — this module only
-adds visualization helpers.
+Bridge between the IK solver (``ik_solver.py``) and the 3-D visualization
+layer (``head.py``, ``render.py``).
 """
 
 import numpy as np
 
-from personality_core.kinematics.stewart_platform_3dof.ik_solver import HeadConfig
 from personality_core.kinematics.stewart_platform_3dof.head import Head
+from personality_core.kinematics.stewart_platform_3dof.ik_solver import HeadConfig
 
 FORWARD_AXIS_HEAD = np.array([1.0, 0.0, 0.0])
 
@@ -35,14 +33,3 @@ def head_from_config(config: HeadConfig) -> Head:
         base_vertices=base_vertices,
         home_pos=config.head_center.copy(),
     )
-
-
-def from_config(config: HeadConfig) -> tuple[Head, HeadConfig]:
-    """Build a ``(Head, HeadConfig)`` pair for visualization + IK.
-
-    The returned :class:`HeadConfig` is the same object that was passed in;
-    use :func:`~personality_core.kinematics.stewart_platform_3dof.ik_solver.solve_ik_from_config`
-    to solve IK with it.
-    """
-    head = head_from_config(config)
-    return head, config

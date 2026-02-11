@@ -54,6 +54,7 @@ all = [
 [project.scripts]
 personality-core-daemon = "personality_core.daemon.app.main:main"
 personality-core-visualize-look-at = "personality_core.kinematics.stewart_platform_3dof.examples.visualize_look_at:cli"
+personality-core-test-head-motors = "personality_core.examples.test_head_motors:cli"
 
 [tool.setuptools]
 package-dir = { "" = "src" }

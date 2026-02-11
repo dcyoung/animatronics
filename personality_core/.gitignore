@@ -1,5 +1,6 @@
 .env
 models/
+reachy_mini/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

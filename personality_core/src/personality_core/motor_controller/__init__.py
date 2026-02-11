@@ -2,22 +2,24 @@
 
 from personality_core.motor_controller.xl430 import (
     DEFAULT_BAUDRATE,
-    DEFAULT_MOTOR_NAME_ID,
-    DEFAULT_SERVO_IDS,
+    DEFAULT_SERVO_CONFIGS,
+    SERVO_PR0,
+    SERVO_PR1,
     SERVO_RESOLUTION,
+    SERVO_YAW,
     HeadPosition,
+    ServoConfig,
     XL430Controller,
-    pos_to_rad,
-    rad_to_pos,
 )
 
 __all__ = [
     "DEFAULT_BAUDRATE",
-    "DEFAULT_MOTOR_NAME_ID",
-    "DEFAULT_SERVO_IDS",
+    "DEFAULT_SERVO_CONFIGS",
+    "SERVO_PR0",
+    "SERVO_PR1",
     "SERVO_RESOLUTION",
+    "SERVO_YAW",
     "HeadPosition",
+    "ServoConfig",
     "XL430Controller",
-    "pos_to_rad",
-    "rad_to_pos",
 ]

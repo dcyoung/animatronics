@@ -31,8 +31,6 @@ class RobotBackend(Backend):
         self,
         serialport: str,
         log_level: str = "INFO",
-        servo_ids: list[int] | None = None,
-        baudrate: int = 57_600,
         use_audio: bool = False,
     ) -> None:
         # Initialise the reachy_mini Backend base class then immediately swap
@@ -50,13 +48,7 @@ class RobotBackend(Backend):
         self.logger.setLevel(log_level)
 
         # -- Motor controller (mirrors ReachyMiniPyControlLoop usage) --------
-        motor_kwargs: dict[str, Any] = {
-            "serial_port": serialport,
-            "baudrate": baudrate,
-        }
-        if servo_ids is not None:
-            motor_kwargs["servo_ids"] = servo_ids
-        self.c: XL430Controller | None = XL430Controller(**motor_kwargs)
+        self.c: XL430Controller | None = XL430Controller(serial_port=serialport)
 
         self.name2id = self.c.get_motor_name_id()
 

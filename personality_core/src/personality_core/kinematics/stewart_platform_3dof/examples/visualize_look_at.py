@@ -2,7 +2,7 @@
 
 Uses the 3-DOF Stewart platform head configuration, IK solver, and
 visualization helpers to animate a head following a target that moves
-in a circle in front of the head.
+in a circle in front of the head (+X).
 
 Run via CLI::
 
@@ -14,12 +14,12 @@ import argparse
 import matplotlib.pyplot as plt
 import numpy as np
 
-from personality_core.kinematics.stewart_platform_3dof.ik_solver import (
-    solve_ik_from_config,
-    symmetric_config,
-)
 from personality_core.kinematics.stewart_platform_3dof import render
-from personality_core.kinematics.stewart_platform_3dof.factory import from_config
+from personality_core.kinematics.stewart_platform_3dof.factory import head_from_config
+from personality_core.kinematics.stewart_platform_3dof.ik_solver import (
+    default_config,
+    solve_ik_from_config,
+)
 from personality_core.kinematics.stewart_platform_3dof.look_at import look_at_rpy
 
 
@@ -28,35 +28,12 @@ def circle_target(
     t: float,
     forward_distance: float,
     radius: float,
-    forward_axis: str = "x",
 ) -> np.ndarray:
-    """Target point on a circle in a plane in front of the head.
-
-    Parameters
-    ----------
-    head_pos : (3,) head position in world.
-    t : parameter along circle (radians).
-    forward_distance : distance of circle plane from head.
-    radius : circle radius.
-    forward_axis : ``'x'``, ``'y'``, or ``'z'``.
-
-    Returns
-    -------
-    (3,) target position in world.
-
-    """
+    """Return a target point on a circle in the YZ plane, forward along +X."""
     head_pos = np.asarray(head_pos).reshape(3)
     center = head_pos.copy()
-    if forward_axis == "z":
-        center[2] += forward_distance
-        return center + radius * np.array([np.cos(t), np.sin(t), 0.0])
-    if forward_axis == "x":
-        center[0] += forward_distance
-        return center + radius * np.array([0.0, np.cos(t), np.sin(t)])
-    if forward_axis == "y":
-        center[1] += forward_distance
-        return center + radius * np.array([np.cos(t), 0.0, np.sin(t)])
-    raise ValueError("forward_axis must be 'x', 'y', or 'z'")
+    center[0] += forward_distance
+    return center + radius * np.array([0.0, np.cos(t), np.sin(t)])
 
 
 def draw_circle(
@@ -64,7 +41,6 @@ def draw_circle(
     head_pos: np.ndarray,
     forward_distance: float,
     radius: float,
-    forward_axis: str = "x",
     n_pts: int = 64,
     color: str = "gray",
     linestyle: str = "--",
@@ -73,10 +49,7 @@ def draw_circle(
     """Draw the look-at target circle in 3-D."""
     ts = np.linspace(0, 2 * np.pi, n_pts, endpoint=False)
     pts = np.array(
-        [
-            circle_target(head_pos, ti, forward_distance, radius, forward_axis)
-            for ti in ts
-        ]
+        [circle_target(head_pos, ti, forward_distance, radius) for ti in ts]
     )
     ax.plot(
         pts[:, 0], pts[:, 1], pts[:, 2],
@@ -88,16 +61,11 @@ def main(
     fps: int = 30,
     forward_distance: float = 80.0,
     radius: float = 40.0,
-    forward_axis: str = "x",
-    yaw_ratio: float = 1.0,
     speed: float = 0.5,
 ):
     """Run look-at visualization: head tracks a target moving on a circle."""
-    config = symmetric_config(
-        r_B=132 / 2, r_P=100 / 2, lhl=30, ldl=130,
-        gamma_B=0.2269, gamma_P=0.82, yaw_ratio=yaw_ratio,
-    )
-    head, config = from_config(config)
+    config = default_config()
+    head = head_from_config(config)
     head_pos = head.home_pos.copy()
 
     fig = plt.figure(figsize=(10, 8))
@@ -123,9 +91,7 @@ def main(
         ax.set_title("Head tracking look-at target (circle)", fontsize=12)
 
         t = (frame / fps) * speed * 2 * np.pi
-        target = circle_target(
-            head_pos, t, forward_distance, radius, forward_axis
-        )
+        target = circle_target(head_pos, t, forward_distance, radius)
         rpy = look_at_rpy(head_pos, target)
         trans = np.zeros(3)
         head.set_pose(trans, rpy)
@@ -175,7 +141,7 @@ def main(
 
         # Draw the circle and current target
         draw_circle(
-            ax, head_pos, forward_distance, radius, forward_axis,
+            ax, head_pos, forward_distance, radius,
             color="gray", linestyle="--", alpha=0.7,
         )
         ax.scatter(
@@ -197,26 +163,13 @@ def cli() -> None:
         "--forward-distance",
         type=float,
         default=80.0,
-        help="Distance of circle plane from head along forward axis",
+        help="Distance of circle plane from head along +X",
     )
     parser.add_argument(
         "--radius",
         type=float,
         default=40.0,
         help="Radius of the target circle",
-    )
-    parser.add_argument(
-        "--forward-axis",
-        type=str,
-        choices=["x", "y", "z"],
-        default="x",
-        help="Axis along which circle is in front of head (x = circle in YZ plane)",
-    )
-    parser.add_argument(
-        "--yaw-ratio",
-        type=float,
-        default=1.0,
-        help="Bevel gear ratio for yaw",
     )
     parser.add_argument(
         "--speed",
@@ -229,8 +182,6 @@ def cli() -> None:
         fps=args.fps,
         forward_distance=args.forward_distance,
         radius=args.radius,
-        forward_axis=args.forward_axis,
-        yaw_ratio=args.yaw_ratio,
         speed=args.speed,
     )
 

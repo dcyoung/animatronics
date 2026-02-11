@@ -23,7 +23,6 @@ from dataclasses import dataclass
 
 import numpy as np
 
-
 # ======================================================================
 # Configuration
 # ======================================================================
@@ -50,7 +49,7 @@ class HeadConfig:
     servo_offsets: np.ndarray
     lhl: float | np.ndarray
     ldl: float | np.ndarray
-    yaw_ratio: float = 1.0
+    yaw_ratio: float
 
     def __post_init__(self) -> None:
         self.head_center = np.asarray(self.head_center).reshape(3)
@@ -62,12 +61,41 @@ class HeadConfig:
         self.ldl = np.broadcast_to(np.asarray(self.ldl, dtype=float), 2)
 
 
+# ======================================================================
+# Default geometry (measured from physical robot)
+# ======================================================================
+# Frame: +X = forward (face), +Y = left, +Z = up.
+# Servo plane at z=0; head_center is derived above.
+
+#: Servo horn rotation origins (world frame, z=0 servo plane).
+#: Columns: [PR0 (left), PR1 (right)].
+#: Measured: 24.5 mm behind head centre, ±14.5 mm left/right.
+_DEFAULT_SERVO_POSITIONS: np.ndarray = np.array(
+    [
+        [-24.5, -24.5],  # x: behind head centre
+        [+14.5, -14.5],  # y: PR0 left, PR1 right
+        [0.0, 0.0],  # z: servo plane
+    ]
+)
+
+#: Rod attachment points on the head plate (head-local frame).
+#: Columns: [PR0 (left), PR1 (right)].
+#: Measured: 29.2 mm behind head centre, ±46.7 mm left/right.
+_DEFAULT_HEAD_ANCHORS: np.ndarray = np.array(
+    [
+        [-29.2, -29.2],  # x: behind head centre
+        [+46.7, -46.7],  # y: PR0 left, PR1 right
+        [0.0, 0.0],  # z
+    ]
+)
+
+
 def default_config(
     servo_positions: np.ndarray | None = None,
     head_anchors: np.ndarray | None = None,
-    lhl: float | np.ndarray = 30.0,
-    ldl: float | np.ndarray = 130.0,
-    yaw_ratio: float = 1.0,
+    lhl: float | np.ndarray = 35.0,
+    ldl: float | np.ndarray = 47.0,
+    yaw_ratio: float = 0.5,
 ) -> HeadConfig:
     """Build a :class:`HeadConfig` from explicit Cartesian positions.
 
@@ -75,10 +103,10 @@ def default_config(
     ----------
     servo_positions : (3, 2), optional
         Horn rotation origins (servo positions) in world frame.
-        Defaults to the standard symmetric layout if *None*.
+        Defaults to :data:`_DEFAULT_SERVO_POSITIONS` (measured from robot).
     head_anchors : (3, 2), optional
         Rod attachment points on the head, in head-local frame.
-        Defaults to the standard symmetric layout if *None*.
+        Defaults to :data:`_DEFAULT_HEAD_ANCHORS`.
     lhl : float or (2,)
         Horn (crank) length(s).
     ldl : float or (2,)
@@ -91,8 +119,10 @@ def default_config(
     HeadConfig
 
     """
-    if servo_positions is None or head_anchors is None:
-        return symmetric_config(lhl=lhl, ldl=ldl, yaw_ratio=yaw_ratio)
+    if servo_positions is None:
+        servo_positions = _DEFAULT_SERVO_POSITIONS.copy()
+    if head_anchors is None:
+        head_anchors = _DEFAULT_HEAD_ANCHORS.copy()
 
     servo_positions = np.asarray(servo_positions)
     head_anchors = np.asarray(head_anchors)
@@ -110,49 +140,6 @@ def default_config(
         head_center=head_center,
         head_anchors=head_anchors,
         servo_offsets=servo_offsets,
-        lhl=lhl,
-        ldl=ldl,
-        yaw_ratio=yaw_ratio,
-    )
-
-
-def symmetric_config(
-    r_B: float = 66.0,
-    r_P: float = 50.0,
-    lhl: float = 30.0,
-    ldl: float = 130.0,
-    gamma_B: float = 0.2269,
-    gamma_P: float = 0.82,
-    yaw_ratio: float = 1.0,
-    anchor_back: float = 15.0,
-) -> HeadConfig:
-    """Convenience: build a symmetric config from polar parameters.
-
-    Servos and anchors are placed on the back (−X axis) at the given
-    radii and angular spreads.  ``anchor_back`` shifts head anchors
-    further in −X.  Delegates to :func:`default_config`.
-    """
-    pi = np.pi
-    psi_B = np.array([pi - gamma_B, pi + gamma_B])
-    psi_P = np.array([pi - gamma_P, pi + gamma_P])
-
-    servo_positions = np.column_stack(
-        [
-            r_B * np.array([np.cos(psi_B[0]), np.sin(psi_B[0]), 0]),
-            r_B * np.array([np.cos(psi_B[1]), np.sin(psi_B[1]), 0]),
-        ]
-    )
-    head_anchors = np.column_stack(
-        [
-            r_P * np.array([np.cos(psi_P[0]), np.sin(psi_P[0]), 0]),
-            r_P * np.array([np.cos(psi_P[1]), np.sin(psi_P[1]), 0]),
-        ]
-    )
-    head_anchors[0, :] -= anchor_back
-
-    return default_config(
-        servo_positions=servo_positions,
-        head_anchors=head_anchors,
         lhl=lhl,
         ldl=ldl,
         yaw_ratio=yaw_ratio,
@@ -214,9 +201,7 @@ def solve_ik(
         if k == 0:
             angle = np.arcsin(g / denom) - np.arctan2(fk, e)
         else:
-            angle = np.arctan2(-e, fk) + np.arccos(
-                np.clip(-g / denom, -1.0, 1.0)
-            )
+            angle = np.arctan2(-e, fk) + np.arccos(np.clip(-g / denom, -1.0, 1.0))
         pr_angles[k] = angle
 
     yaw_servo = rpy[2] / yaw_ratio

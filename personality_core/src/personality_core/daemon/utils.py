@@ -10,7 +10,7 @@ import serial.tools.list_ports
 
 def find_serial_port(
     vid: str = "0403",
-    pid: str = "6013",
+    pid: str = "6014",
 ) -> list[str]:
     """Find serial ports for Personality Core based on USB VID and PID.
 
@@ -24,6 +24,8 @@ def find_serial_port(
     """
     vid = vid.upper()
     pid = pid.upper()
+    # for p in serial.tools.list_ports.comports():
+    #     print(p.hwid)
     return [
         p.device
         for p in serial.tools.list_ports.comports()

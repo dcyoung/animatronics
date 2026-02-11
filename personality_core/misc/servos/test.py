@@ -1,32 +1,22 @@
 import time
-from rustypot import Xl430PyController
 import numpy as np
+from servo import (
+    SERVO_PR_LEFT,
+    SERVO_PR_RIGHT,
+    SERVO_YAW,
+    rad2pos,
+    get_servo_controller,
+)
 
-SERVO_IDS = [0, 1, 2]
-RESOLUTION = 4096
-
-
-def rad2pos(rad):
-    # 0 rad => 0,
-    # 2pi => RESOLUTION
-    return int((rad % (2 * np.pi)) / (2 * np.pi) * RESOLUTION)
-
-
-# def deg2pos(deg):
-#     rad = np.deg2rad(deg)
-#     return rad2pos(rad)
+SERVOS = [SERVO_PR_LEFT, SERVO_PR_RIGHT, SERVO_YAW]
 
 
 def main():
     print("Starting servo test...")
-    c = Xl430PyController(
-        serial_port="/dev/tty.usbserial-FTAAMLB8",
-        # serial_port="/dev/cu.usbserial-FTAAMLB8",
-        baudrate=57_600,
-        timeout=0.1,
-    )
+    c = get_servo_controller()
 
     print("Enabling torque...")
+    SERVO_IDS = [servo.id for servo in SERVOS]
     for servo_id in SERVO_IDS:
         c.write_torque_enable(servo_id, True)
 
@@ -34,6 +24,7 @@ def main():
     center = np.deg2rad(180)
     freq = 0.1
     print("Starting sinusoidal motion...")
+
     while True:
         t = time.time()
         phase_shifts = [id * (1 / freq) / len(SERVO_IDS) for id in SERVO_IDS]

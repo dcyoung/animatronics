@@ -7,9 +7,8 @@ Forward convention: head forward = +X (face), back = -X (PR anchors).
 
 import numpy as np
 
-from personality_core.kinematics.stewart_platform_3dof.factory import (
-    FORWARD_AXIS_HEAD,
-)
+#: Head forward axis: +X (face direction).
+FORWARD_AXIS_HEAD = np.array([1.0, 0.0, 0.0])
 
 _DEFAULT_FORWARD = FORWARD_AXIS_HEAD
 
