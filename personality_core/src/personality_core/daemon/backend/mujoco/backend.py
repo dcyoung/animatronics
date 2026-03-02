@@ -73,7 +73,11 @@ class MujocoBackend(Backend):
 
             if self.ik_required:
                 try:
-                    self.update_target_head_joints_from_ik(self.target_head_pose)
+                    self.update_target_head_joints_from_ik(
+                        pose=self.target_head_pose,
+                        # reachy_mini compat: Body yaw is not supported on this robot.
+                        body_yaw=None,
+                    )
                 except ValueError:
                     pass
 

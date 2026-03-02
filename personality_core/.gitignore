@@ -1,4 +1,5 @@
 .env
+ref/
 models/
 reachy_mini/
 # Byte-compiled / optimized / DLL files

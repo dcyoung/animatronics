@@ -112,7 +112,11 @@ class RobotBackend(Backend):
 
                 if self.ik_required:
                     try:
-                        self.update_target_head_joints_from_ik(self.target_head_pose)
+                        self.update_target_head_joints_from_ik(
+                            pose=self.target_head_pose,
+                            # reachy_mini compat: Body yaw is not supported on this robot.
+                            body_yaw=None,
+                        )
                     except ValueError as e:
                         self.logger.warning(f"IK error: {e}")
 
@@ -127,9 +131,7 @@ class RobotBackend(Backend):
                         )
                     )
                     self.pose_publisher.put(
-                        json.dumps(
-                            {"head_pose": self.get_present_head_pose().tolist()}
-                        )
+                        json.dumps({"head_pose": self.get_present_head_pose().tolist()})
                     )
 
                 self._status.last_alive = time.time()
@@ -149,15 +151,13 @@ class RobotBackend(Backend):
         if time.time() - self._stats_record_t0 > self._stats_record_period:
             dt = np.diff(self._stats["timestamps"])
             if len(dt) > 1:
-                self._status.control_loop_stats[
-                    "mean_control_loop_frequency"
-                ] = float(np.mean(1.0 / dt))
-                self._status.control_loop_stats[
-                    "max_control_loop_interval"
-                ] = float(np.max(dt))
-                self._status.control_loop_stats["nb_error"] = self._stats[
-                    "nb_error"
-                ]
+                self._status.control_loop_stats["mean_control_loop_frequency"] = float(
+                    np.mean(1.0 / dt)
+                )
+                self._status.control_loop_stats["max_control_loop_interval"] = float(
+                    np.max(dt)
+                )
+                self._status.control_loop_stats["nb_error"] = self._stats["nb_error"]
                 self._status.control_loop_stats["motor_controller"] = str(
                     self.c.get_stats()
                 )
@@ -246,11 +246,13 @@ class RobotBackend(Backend):
 
     INIT_HEAD_POSE = np.eye(4)
 
-    _sleep_rotation = np.array([
-        [0.911, 0.0, 0.413],
-        [0.0, 1.0, 0.0],
-        [-0.413, 0.0, 0.911],
-    ])
+    _sleep_rotation = np.array(
+        [
+            [0.911, 0.0, 0.413],
+            [0.0, 1.0, 0.0],
+            [-0.413, 0.0, 0.911],
+        ]
+    )
     SLEEP_HEAD_POSE = np.eye(4)
     SLEEP_HEAD_POSE[:3, :3] = _sleep_rotation
 
